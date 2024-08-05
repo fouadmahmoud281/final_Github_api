@@ -12,11 +12,9 @@ from github_api.get_owner_node_id import get_owner_node_id
 from github_api.get_user_id_by_login import get_user_id_by_login
 from github_api.get_repo_id import get_repo_id
 from github_api.update_project_item_field_value import update_project_item_field_value
-from github_api.update_issue_custom_status import update_issue_custom_status
-from github_api.get_field_id import get_field_id
 from config import GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, branch_name
 
-def push_user_stories_to_project(github_token, repo_owner, repo_name, project_name, user_stories_json, collaborators_json, suggestions_json, status_field_name):
+def push_user_stories_to_project(github_token, repo_owner, repo_name, project_name, user_stories_json, collaborators_json, suggestions_json):
     try:
         repo_info = create_repository(repo_owner, repo_name, github_token)
         print(f"Successfully created repository '{repo_name}'")
@@ -54,18 +52,11 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
         return
 
     try:
-        suggestions_field = create_custom_field(project_id, "Suggestions", "TEXT", github_token)
-        suggestions_field_id = suggestions_field['id']
-        print(f"Successfully created custom field 'Suggestions' with ID: {suggestions_field_id}")
+        custom_field = create_custom_field(project_id, "Suggestions", "TEXT", github_token)
+        custom_field_id = custom_field['id']
+        print(f"Successfully created custom field 'Suggestions' with ID: {custom_field_id}")
     except Exception as e:
         print(f"Error creating custom field 'Suggestions': {e}")
-        return
-
-    try:
-        status_field_id = get_field_id(project_id, status_field_name, github_token)
-        print(f"Successfully fetched status field ID: {status_field_id}")
-    except Exception as e:
-        print(f"Error fetching status field ID: {e}")
         return
 
     try:
@@ -133,11 +124,11 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
         return
 
     #try:
-     #   invited_collaborators = invite_collaborators(project_id, collaborators, github_token)
-      #  print(f"Successfully invited collaborators: {invited_collaborators}")
+        #invited_collaborators = invite_collaborators(project_id, collaborators, github_token)
+        #print(f"Successfully invited collaborators: {invited_collaborators}")
     #except Exception as e:
-     #   print(f"Error inviting collaborators: {e}")
-      #  return
+        #print(f"Error inviting collaborators: {e}")
+        #return
 
     try:
         converted_issue_ids = []
@@ -162,18 +153,10 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
             draft_issue_id = story_to_draft_id.get(story_id)
             if draft_issue_id:
                 suggestions_text = "\n\n".join([f"***** {suggestion}" for suggestion in data['suggestions']])
-                update_project_item_field_value(project_id, draft_issue_id, suggestions_field_id, {"text": suggestions_text}, github_token)
+                update_project_item_field_value(project_id, draft_issue_id, custom_field_id, {"text": suggestions_text}, github_token)
                 print(f"Successfully updated custom field 'Suggestions' for issue with ID: {draft_issue_id}")
     except Exception as e:
         print(f"Error updating custom field 'Suggestions': {e}")
-        return
-
-    try:
-        for draft_issue_id in assignable_ids:
-            update_issue_custom_status(project_id, draft_issue_id, status_field_id, "Todo", github_token)
-            print(f"Successfully updated issue status to 'inprogress' for issue with ID: {draft_issue_id}")
-    except Exception as e:
-        print(f"Error updating issue status: {e}")
         return
 
 if __name__ == "__main__":
@@ -231,7 +214,5 @@ if __name__ == "__main__":
     with open("suggestions.json", "r") as file:
         suggestions_json = file.read()
 
-    status_field_name = "Status"  # Replace with your actual status field name
-
-    push_user_stories_to_project(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, user_stories_json, collaborators_json, suggestions_json, status_field_name)
+    push_user_stories_to_project(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, user_stories_json, collaborators_json, suggestions_json)
     #create_file_structure(REPO_OWNER, REPO_NAME, branch_name, file_structure, GITHUB_TOKEN)
