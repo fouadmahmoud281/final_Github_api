@@ -11,15 +11,10 @@ from github_api.add_assignees import add_assignees_to_assignable
 from github_api.get_owner_node_id import get_owner_node_id
 from github_api.get_user_id_by_login import get_user_id_by_login
 from github_api.get_repo_id import get_repo_id
-from github_api.list_branches import list_branches
-from github_api.get_branch_oid import get_branch_oid
-from github_api.create_branch import create_branch
-from github_api.create_commit import create_commit
-from github_api.process_structure import process_structure
-from github_api.create_file_structure import create_file_structure
+from github_api.update_project_item_field_value import update_project_item_field_value
 from config import GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, branch_name
 
-def push_user_stories_to_project(github_token, repo_owner, repo_name, project_name, user_stories_json, collaborators_json):
+def push_user_stories_to_project(github_token, repo_owner, repo_name, project_name, user_stories_json, collaborators_json, suggestions_json):
     try:
         repo_info = create_repository(repo_owner, repo_name, github_token)
         print(f"Successfully created repository '{repo_name}'")
@@ -57,20 +52,23 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
         return
 
     try:
-        custom_field = create_custom_field(project_id, "Files Related", "TEXT", github_token)
-        print(f"Successfully created custom field 'Brainstorming' with ID: {custom_field['id']}")
+        custom_field = create_custom_field(project_id, "Suggestions", "TEXT", github_token)
+        custom_field_id = custom_field['id']
+        print(f"Successfully created custom field 'Suggestions' with ID: {custom_field_id}")
     except Exception as e:
-        print(f"Error creating custom field 'Brainstorming': {e}")
+        print(f"Error creating custom field 'Suggestions': {e}")
         return
 
     try:
         user_stories = json.loads(user_stories_json)
+        suggestions = json.loads(suggestions_json)
     except json.JSONDecodeError as e:
         print(f"Error parsing JSON: {e}")
         return
 
     assignable_ids = []
-    for story in user_stories:
+    story_to_draft_id = {}
+    for idx, story in enumerate(user_stories, 1):
         note = story.get('note')
         role_action_reason = story.get('role_action_reason', '**As a user,**')
         acceptance_criteria = story.get('acceptance_criteria', [
@@ -103,6 +101,7 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
             draft_issue_id = add_draft_issue_to_project(project_id, note, description, github_token)
             print(f"Successfully added draft issue '{note}' with ID: {draft_issue_id}")
             assignable_ids.append(draft_issue_id)
+            story_to_draft_id[str(idx)] = draft_issue_id
         except Exception as e:
             print(f"Error creating draft issue for story '{note}': {e}")
             continue
@@ -124,12 +123,12 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
         print(f"Error fetching user IDs: {e}")
         return
 
-    try:
-        invited_collaborators = invite_collaborators(project_id, collaborators, github_token)
-        print(f"Successfully invited collaborators: {invited_collaborators}")
-    except Exception as e:
-        print(f"Error inviting collaborators: {e}")
-        return
+    #try:
+        #invited_collaborators = invite_collaborators(project_id, collaborators, github_token)
+        #print(f"Successfully invited collaborators: {invited_collaborators}")
+    #except Exception as e:
+        #print(f"Error inviting collaborators: {e}")
+        #return
 
     try:
         converted_issue_ids = []
@@ -149,58 +148,71 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
         print(f"Error assigning collaborators: {e}")
         return
 
+    try:
+        for story_id, data in suggestions.items():
+            draft_issue_id = story_to_draft_id.get(story_id)
+            if draft_issue_id:
+                suggestions_text = "\n\n".join([f"***** {suggestion}" for suggestion in data['suggestions']])
+                update_project_item_field_value(project_id, draft_issue_id, custom_field_id, {"text": suggestions_text}, github_token)
+                print(f"Successfully updated custom field 'Suggestions' for issue with ID: {draft_issue_id}")
+    except Exception as e:
+        print(f"Error updating custom field 'Suggestions': {e}")
+        return
+
 if __name__ == "__main__":
     file_structure = {
-    "frontend": {
-        "components": {
-            "SearchBar.js": "Content of SearchBar.js",
-            "ProductListing.js": "Content of ProductListing.js",
-            "ProductDetailsModal.js": "Content of ProductDetailsModal.js",
-            "ShoppingCart.js": "Content of ShoppingCart.js",
-            "Checkout.js": "Content of Checkout.js"
+        "frontend": {
+            "components": {
+                "SearchBar.js": "Content of SearchBar.js",
+                "ProductListing.js": "Content of ProductListing.js",
+                "ProductDetailsModal.js": "Content of ProductDetailsModal.js",
+                "ShoppingCart.js": "Content of ShoppingCart.js",
+                "Checkout.js": "Content of Checkout.js"
+            },
+            "pages": {
+                "Home.js": "Content of Home.js"
+            },
+            "App.js": "Content of App.js"
         },
-        "pages": {
-            "Home.js": "Content of Home.js"
+        "backend": {
+            "controllers": {
+                "ProductController.js": "Content of ProductController.js",
+                "CartController.js": "Content of CartController.js",
+                "OrderController.js": "Content of OrderController.js"
+            },
+            "models": {
+                "Product.js": "Content of Product.js",
+                "Cart.js": "Content of Cart.js",
+                "Order.js": "Content of Order.js"
+            },
+            "routes": {
+                "productRoutes.js": "Content of productRoutes.js",
+                "cartRoutes.js": "Content of cartRoutes.js",
+                "orderRoutes.js": "Content of orderRoutes.js"
+            },
+            "server.js": "Content of server.js"
         },
-        "App.js": "Content of App.js"
-    },
-    "backend": {
-        "controllers": {
-            "ProductController.js": "Content of ProductController.js",
-            "CartController.js": "Content of CartController.js",
-            "OrderController.js": "Content of OrderController.js"
-        },
-        "models": {
-            "Product.js": "Content of Product.js",
-            "Cart.js": "Content of Cart.js",
-            "Order.js": "Content of Order.js"
-        },
-        "routes": {
-            "productRoutes.js": "Content of productRoutes.js",
-            "cartRoutes.js": "Content of cartRoutes.js",
-            "orderRoutes.js": "Content of orderRoutes.js"
-        },
-        "server.js": "Content of server.js"
-    },
-    "database": {
-        "migrations": {
-            "create_products_table.sql": "Content of create_products_table.sql",
-            "create_cart_table.sql": "Content of create_cart_table.sql",
-            "create_orders_table.sql": "Content of create_orders_table.sql"
-        },
-        "seeds": {
-            "seed_products.sql": "Content of seed_products.sql",
-            "seed_cart.sql": "Content of seed_cart.sql",
-            "seed_orders.sql": "Content of seed_orders.sql"
-        },
-        "connection.js": "Content of connection.js"
+        "database": {
+            "migrations": {
+                "create_products_table.sql": "Content of create_products_table.sql",
+                "create_cart_table.sql": "Content of create_cart_table.sql",
+                "create_orders_table.sql": "Content of create_orders_table.sql"
+            },
+            "seeds": {
+                "seed_products.sql": "Content of seed_products.sql",
+                "seed_cart.sql": "Content of seed_cart.sql",
+                "seed_orders.sql": "Content of seed_orders.sql"
+            },
+            "connection.js": "Content of connection.js"
+        }
     }
-}
 
     with open("user_stories.json", "r") as file:
         user_stories_json = file.read()
     with open("collaborators.json", "r") as file:
         collaborators_json = file.read()
+    with open("suggestions.json", "r") as file:
+        suggestions_json = file.read()
 
-    push_user_stories_to_project(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, user_stories_json, collaborators_json)
-    create_file_structure(REPO_OWNER, REPO_NAME, branch_name, file_structure, GITHUB_TOKEN)
+    push_user_stories_to_project(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, user_stories_json, collaborators_json, suggestions_json)
+    #create_file_structure(REPO_OWNER, REPO_NAME, branch_name, file_structure, GITHUB_TOKEN)

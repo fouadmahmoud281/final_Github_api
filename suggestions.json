@@ -1,0 +1,65 @@
+{
+    "1": {
+        "user_story": [
+            "ID: 375",
+            "Title: User Profile Creation**"
+        ],
+        "suggestions": [
+            "frontend/src/components/ProfileForm.js",
+            "backend/controllers/ProfileController.js",
+            "backend/models/Profile.js",
+            "backend/routes/profileRoutes.js",
+            "database/profiles.json"
+        ]
+    },
+    "2": {
+        "user_story": [
+            "ID: 376",
+            "Title: Search Function Enhancement**"
+        ],
+        "suggestions": [
+            "frontend/src/components/SearchBar.js",
+            "backend/controllers/SearchController.js",
+            "backend/routes/searchRoutes.js",
+            "frontend/src/components/ShoppingCart.js",
+            "backend/controllers/ShoppingCartController.js"
+        ]
+    },
+    "3": {
+        "user_story": [
+            "ID: 377",
+            "Title: Cart Management Feature**"
+        ],
+        "suggestions": [
+            "backend/models/Product.js",
+            "backend/routes/shoppingCartRoutes.js",
+            "database/products.json",
+            "frontend/src/components/OrderTracking.js",
+            "backend/controllers/OrderTrackingController.js"
+        ]
+    },
+    "4": {
+        "user_story": [
+            "ID: 378",
+            "Title: Order Tracking Feature**"
+        ],
+        "suggestions": [
+            "backend/models/Order.js",
+            "backend/routes/orderTrackingRoutes.js",
+            "database/orders.json",
+            "frontend/src/components/PaymentForm.js",
+            "backend/controllers/PaymentController.js"
+        ]
+    },
+    "5": {
+        "user_story": [
+            "ID: 379",
+            "Title: Payment Gateway Integration**"
+        ],
+        "suggestions": [
+            "backend/models/Payment.js",
+            "backend/routes/paymentRoutes.js",
+            "database/payments.json"
+        ]
+    }
+}
