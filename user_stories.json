@@ -1,0 +1,50 @@
+[
+    {
+        "note": "User story 1",
+        "role_action_reason": "**As a developer,** I want to write clean code so that the application is maintainable.",
+        "acceptance_criteria": [
+            "Criteria 1: Code is well-documented.",
+            "Criteria 2: Code follows the project's coding standards.",
+            "Criteria 3: Code is free of linting errors."
+        ],
+        "definition_of_done": [
+            "All acceptance criteria are met.",
+            "Code is reviewed and approved.",
+            "Necessary tests are written and pass.",
+            "Documentation is updated, if applicable.",
+            "Feature is deployed to the staging environment."
+        ]
+    },
+    {
+        "note": "User story 2",
+        "role_action_reason": "**As a user,** I want to be able to reset my password so that I can regain access to my account if I forget my password.",
+        "acceptance_criteria": [
+            "Criteria 1: Password reset link is sent to the registered email.",
+            "Criteria 2: User can set a new password using the reset link.",
+            "Criteria 3: User is notified of the successful password reset."
+        ],
+        "definition_of_done": [
+            "All acceptance criteria are met.",
+            "Code is reviewed and approved.",
+            "Necessary tests are written and pass.",
+            "Documentation is updated, if applicable.",
+            "Feature is deployed to the production environment."
+        ]
+    },
+    {
+        "note": "User story 3",
+        "role_action_reason": "**As an admin,** I want to be able to view user activity logs so that I can monitor user behavior and detect any suspicious activity.",
+        "acceptance_criteria": [
+            "Criteria 1: Admin can access the activity logs page.",
+            "Criteria 2: Logs are displayed in a readable format.",
+            "Criteria 3: Admin can filter logs by date and user."
+        ],
+        "definition_of_done": [
+            "All acceptance criteria are met.",
+            "Code is reviewed and approved.",
+            "Necessary tests are written and pass.",
+            "Documentation is updated, if applicable.",
+            "Feature is deployed to the production environment."
+        ]
+    }
+]

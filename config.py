@@ -1,0 +1,5 @@
+GITHUB_TOKEN = "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"
+REPO_OWNER = "fouadmahmoud281"
+REPO_NAME = "mvptesting"
+PROJECT_NAME = "TestingObelion"
+branch_name = "main"
