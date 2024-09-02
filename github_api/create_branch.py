@@ -1,6 +1,14 @@
 from .execute_github_graphql_query import execute_github_graphql_query
-
+from .list_branches import list_branches
+from config import GITHUB_TOKEN, REPO_OWNER, REPO_NAME
 def create_branch(repository_id, base_oid, branch_name, GITHUB_TOKEN):
+    # List branches in the repository
+    branches = list_branches(REPO_OWNER, REPO_NAME,GITHUB_TOKEN)
+
+    if branch_name in branches:
+        print(f"Branch '{branch_name}' already exists. Skipping creation.")
+        return branch_name
+
     query = """
     mutation($input: CreateRefInput!) {
       createRef(input: $input) {

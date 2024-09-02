@@ -10,11 +10,17 @@ from github_api.invite_collaborators import invite_collaborators
 from github_api.add_assignees import add_assignees_to_assignable
 from github_api.get_owner_node_id import get_owner_node_id
 from github_api.get_user_id_by_login import get_user_id_by_login
+from github_api.get_branch_oid import get_branch_oid
+from github_api.get_latest_commit_oid import get_latest_commit_oid
 from github_api.get_repo_id import get_repo_id
 from github_api.update_project_item_field_value import update_project_item_field_value
 from github_api.update_issue_custom_status import update_issue_custom_status
 from github_api.get_field_id import get_field_id
-from config import GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, branch_name
+from github_api.create_file_structure import create_file_structure
+from github_api.get_single_select_option_id import get_single_select_option_id
+from github_api.update_file import update_file_on_github
+from config import GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, branch_name,user_branch_name
+import base64
 
 def push_user_stories_to_project(github_token, repo_owner, repo_name, project_name, user_stories_json, collaborators_json, suggestions_json, status_field_name):
     try:
@@ -170,8 +176,9 @@ def push_user_stories_to_project(github_token, repo_owner, repo_name, project_na
 
     try:
         for draft_issue_id in assignable_ids:
-            update_issue_custom_status(project_id, draft_issue_id, status_field_id, "Todo", github_token)
-            print(f"Successfully updated issue status to 'inprogress' for issue with ID: {draft_issue_id}")
+            option_id = get_single_select_option_id(project_id, status_field_id, "Todo", github_token)
+            update_issue_custom_status(project_id, draft_issue_id, status_field_id, option_id, github_token)
+            print(f"Successfully updated issue status to 'Todo' for issue with ID: {draft_issue_id}")
     except Exception as e:
         print(f"Error updating issue status: {e}")
         return
@@ -234,4 +241,27 @@ if __name__ == "__main__":
     status_field_name = "Status"  # Replace with your actual status field name
 
     push_user_stories_to_project(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, PROJECT_NAME, user_stories_json, collaborators_json, suggestions_json, status_field_name)
-    #create_file_structure(REPO_OWNER, REPO_NAME, branch_name, file_structure, GITHUB_TOKEN)
+    latest_commit_oid = create_file_structure(REPO_OWNER, REPO_NAME, user_branch_name, file_structure, GITHUB_TOKEN)
+    latest_commit_oid = get_latest_commit_oid(REPO_OWNER, REPO_NAME, user_branch_name, GITHUB_TOKEN)
+
+
+
+    # Test the update_file_on_github function
+    file_path = "frontend/components/SearchBar.js"
+    new_file_content = """
+import React from 'react';
+
+const SearchBar = () => {
+  return (
+    <div>
+      <input type="text" placeholder="Search..." />
+      <button>Search</button>
+    </div>
+  );
+};
+
+export default SearchBar;
+"""
+encoded_new_file_content = base64.b64encode(new_file_content.encode('utf-8')).decode('utf-8')
+
+update_file_on_github(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, user_branch_name, file_path, encoded_new_file_content,latest_commit_oid)
