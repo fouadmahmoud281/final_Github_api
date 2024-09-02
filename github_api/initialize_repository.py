@@ -3,7 +3,7 @@ from langchain_community.llms import OpenAI
 import fitz  # PyMuPDF
 
 pdf_path = "E:\Obelion.Ai\github_api\ToDo-BRD.pdf"
-api_key = "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"
+api_key
 def extract_text_from_pdf(pdf_path):
     with fitz.open(pdf_path) as doc:
         text = ""
@@ -12,7 +12,7 @@ def extract_text_from_pdf(pdf_path):
         return text
 
 def create_readme(text):
-    llm = OpenAI(api_key="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")
+    llm = OpenAI(api_key)
     prompt = f"summarize the following Business Requirements Document (BRD) content and structure it into a professional README suitable for GitHub developers. The README should include sections such as Project Title, Description, Features, Installation, Usage, Contributing, License, and Contact Information. Ensure clarity, conciseness, and technical accuracy\n\n{text}\n\nREADME:"
     response = llm(prompt)
     return response
@@ -20,7 +20,7 @@ def create_readme(text):
 
 def initialize_repository(repo_owner, repo_name, token):
     brd_pdf_path = "E:\Obelion.Ai\github_api\ToDo-BRD.pdf"
-    api_key = "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"
+    api_key 
     text = extract_text_from_pdf(brd_pdf_path)
     readme_content = create_readme(text)
     license_content = "MIT License\n\nYour license text here."

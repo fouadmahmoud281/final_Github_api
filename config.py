@@ -1,4 +1,4 @@
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN
 REPO_OWNER = "fouadmahmoud281"
 REPO_NAME = "test2"
 PROJECT_NAME = "test2"
